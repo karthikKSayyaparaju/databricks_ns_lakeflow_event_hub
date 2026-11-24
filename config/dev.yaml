@@ -4,7 +4,7 @@ kafka:
   security_protocol: "SASL_SSL"
   sasl_mechanism: "PLAIN"
   starting_offsets: "earliest"
-  max_offsets_per_trigger: 10000
+  max_offsets_per_trigger: 100
   secrets:
     scope: "confluent-kafka-key-value"
     key_name: "api_key"
@@ -16,4 +16,6 @@ schemas:
   silver: "silver"
   gold: "gold"
 
-checkpoint_root: "/Volumes/dev/bronze/_checkpoints"
+checkpoint:
+  volume: "checkpoints"          # UC Volume name inside the bronze schema
+  bronze_events: "bronze/events_raw"
