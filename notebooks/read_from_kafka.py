@@ -1,7 +1,10 @@
-import os
-from config_loader import load_config, build_kafka_options
+import sys, os
 
-repo_root  = "/Workspace/Shared/databricks_ns_lakeflow_event_hub"
+repo_root = "/Workspace/Shared/databricks_ns_lakeflow_event_hub"
+sys.path.insert(0, os.path.join(repo_root, "src"))
+
+from common.config_loader import load_config, build_kafka_options
+
 config_dir = os.path.join(repo_root, "config")
 print(os.listdir(config_dir))      # should show base.yaml, dev.yaml, ...
 
