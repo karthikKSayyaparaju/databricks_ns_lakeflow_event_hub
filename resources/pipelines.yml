@@ -3,7 +3,7 @@ resources:
 
     # Bronze + Silver — always on (Kafka -> events_raw -> orders / orders_quarantine)
     orders_streaming:
-      name: orders_streaming_${bundle.target}
+      name: orders_streaming_bronze_and_silver_${bundle.target}
       catalog: ${var.catalog}
       schema: bronze
       serverless: true
