@@ -1,0 +1,13 @@
+=== Confluent Cloud API key ===
+
+API key:
+5UXC54ON4TV5NJU6
+
+API secret:
+cfltTad89xNj0vFu76MFDanB1OpVkHxwOGkZswq0fflcyAojMxkYDMQOq8OZO/fQ
+
+Resource:
+lkc-gq3m03r
+
+Bootstrap server:
+pkc-619z3.us-east1.gcp.confluent.cloud:9092
