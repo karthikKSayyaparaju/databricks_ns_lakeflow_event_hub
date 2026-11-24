@@ -1,0 +1,19 @@
+kafka:
+  bootstrap_servers: "pkc-619z3.us-east1.gcp.confluent.cloud:9092"
+  topic: "sample_data_orders"
+  security_protocol: "SASL_SSL"
+  sasl_mechanism: "PLAIN"
+  starting_offsets: "earliest"
+  max_offsets_per_trigger: 10000
+  secrets:
+    scope: "confluent"
+    key_name: "api_key"
+    secret_name: "api_secret"
+
+catalog: "dev"
+schemas:
+  bronze: "bronze"
+  silver: "silver"
+  gold: "gold"
+
+checkpoint_root: "/Volumes/dev/bronze/_checkpoints"
