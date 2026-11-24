@@ -17,8 +17,18 @@ kafka_opts["startingOffsets"] = "earliest"     # first run only
 )
 def events_raw():
     return (spark.readStream.format("kafka").options(**kafka_opts).load()
-            .select(col("key").cast("string").alias("kafka_key"),
-                    col("value").cast("string").alias("raw_payload"),
-                    "topic", "partition", "offset",
-                    col("timestamp").alias("kafka_ts"),
-                    current_timestamp().alias("ingest_ts")))
+            .select(
+        F.col("key").cast("string").alias("kafka_key"),
+        F.col("value").alias("raw_value"),                       # original bytes, untouched
+        # Schema Registry wire format = 0x00 + 4-byte schema id + payload
+        F.expr("""CASE WHEN substring(value, 1, 1) = X'00'
+                           THEN CAST(substring(value, 6) AS STRING)
+                           ELSE CAST(value AS STRING) END""").alias("raw_payload"),
+        F.expr("""CASE WHEN substring(value, 1, 1) = X'00'
+                           THEN CAST(conv(hex(substring(value, 2, 4)), 16, 10) AS INT)
+                      END""").alias("schema_id"),                    # which schema version produced it
+        "topic", "partition", "offset",
+        F.col("timestamp").alias("kafka_ts"),
+        F.current_timestamp().alias("ingest_ts"),
+    )
+            .withColumn("ingest_date", F.to_date("ingest_ts")))
