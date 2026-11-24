@@ -1,6 +1,7 @@
 import sys, os
 import dlt
 from pyspark.sql.functions import col, current_timestamp
+from pyspark.sql import functions as F
 
 repo_root = spark.conf.get("pipeline.repo_root")
 sys.path.insert(0, os.path.join(repo_root, "src"))
