@@ -1,0 +1,38 @@
+resources:
+  pipelines:
+
+    # Bronze + Silver — always on (Kafka -> events_raw -> orders / orders_quarantine)
+    orders_streaming:
+      name: orders_streaming_${bundle.target}
+      catalog: ${var.catalog}
+      schema: bronze
+      serverless: true
+      continuous: true
+      photon: true
+      channel: CURRENT
+      root_path: ${workspace.file_path}
+      libraries:
+        - glob:
+            include: ../pipelines/streaming/**
+      configuration:
+        pipeline.repo_root: ${workspace.file_path}
+        pipeline.env: ${bundle.target}
+      notifications:
+        - email_recipients: [ "${var.alert_email}" ]
+          alerts: [ on-update-fatal-failure, on-flow-failure ]
+
+    # Gold — triggered (refreshed by the hourly job after the DQ gate passes)
+    orders_gold:
+      name: orders_gold_${bundle.target}
+      catalog: ${var.catalog}
+      schema: gold
+      serverless: true
+      continuous: false
+      channel: CURRENT
+      root_path: ${workspace.file_path}
+      libraries:
+        - glob:
+            include: ../pipelines/gold/**
+      configuration:
+        pipeline.repo_root: ${workspace.file_path}
+        pipeline.env: ${bundle.target}

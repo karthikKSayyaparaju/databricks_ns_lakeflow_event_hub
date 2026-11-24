@@ -1,0 +1,13 @@
+# IDE
+.idea/
+*.iml
+
+# Secrets — never commit
+config/*key*.txt
+*.env
+.databrickscfg
+
+# Bundle / Python artifacts
+.databricks/
+__pycache__/
+*.pyc

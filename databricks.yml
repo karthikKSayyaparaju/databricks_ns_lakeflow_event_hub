@@ -1,0 +1,35 @@
+bundle:
+  name: databricks_ns_lakeflow_event_hub
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog catalog for this environment
+  alert_email:
+    description: Who gets DQ / failure alerts
+    default: karthik.ml.engineer@gmail.com
+  schedule_pause:
+    description: PAUSED in dev so jobs don't burn credits; UNPAUSED in prod
+    default: PAUSED
+
+targets:
+  dev:
+    mode: development          # prefixes resource names with [dev <user>], pauses schedules
+    default: true
+    workspace:
+      host: https://dbc-a964c370-590b.cloud.databricks.com
+    variables:
+      catalog: dev
+
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-a964c370-590b.cloud.databricks.com   # replace with prod workspace URL
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: prod
+      schedule_pause: UNPAUSED
+    # run_as:
+    #   service_principal_name: <prod-service-principal-app-id>

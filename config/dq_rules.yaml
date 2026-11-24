@@ -1,0 +1,45 @@
+# Dynamic data-quality rules for Silver.
+# Add / remove / edit rules here — no code change needed.
+#
+# action:
+#   quarantine -> row is routed to the quarantine table with reason_code (not loaded to Silver)
+#   warn       -> row is still loaded to Silver; failure is only recorded in pipeline metrics
+#
+# Rules are Spark SQL boolean expressions evaluated against the parsed/flattened columns
+# (plus raw_payload). A rule that evaluates to NULL is treated as FAILED.
+
+silver_orders:
+  # Top-level JSON keys every message must contain (checked against raw_payload)
+  required_fields: [ordertime, orderid, itemid, orderunits, address]
+  missing_fields_reason_code: "E002_MISSING_FIELDS"
+
+  rules:
+    - name: valid_json
+      rule: "json_object_keys(raw_payload) IS NOT NULL"
+      reason_code: "E001_INVALID_JSON"
+      action: quarantine
+
+    - name: order_id_not_null
+      rule: "order_id IS NOT NULL"
+      reason_code: "E003_NULL_ORDER_ID"
+      action: quarantine
+
+    - name: valid_order_ts
+      rule: "order_ts IS NOT NULL AND order_ts <= current_timestamp() + INTERVAL 1 HOUR"
+      reason_code: "E004_BAD_ORDER_TS"
+      action: quarantine
+
+    - name: positive_units
+      rule: "order_units > 0"
+      reason_code: "E005_INVALID_UNITS"
+      action: quarantine
+
+    - name: item_id_format
+      rule: "item_id RLIKE '^Item_[0-9]+$'"
+      reason_code: "E006_BAD_ITEM_ID"
+      action: quarantine
+
+    - name: state_present
+      rule: "state IS NOT NULL"
+      reason_code: "W001_MISSING_STATE"
+      action: warn
